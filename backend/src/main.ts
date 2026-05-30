@@ -3,6 +3,9 @@ import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as dns from 'dns';
+
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 async function bootstrap() {
   dotenv.config();
