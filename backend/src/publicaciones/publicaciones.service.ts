@@ -28,26 +28,43 @@ export class PublicacionesService {
         try {
           const { usuario, limit, offset, orden } = options;
       
-          const sortOption: Record<string, SortOrder> =
-            orden === 'likes' ? { likes: -1 } : { createdAt: -1 };
-      
-          const query: any = {};
+          const pipeline: any[] = [];
           if (usuario) {
-            query.usuarioId = usuario;
+            const userObjId = Types.ObjectId.isValid(usuario) ? new Types.ObjectId(usuario) : usuario;
+            pipeline.push({ $match: { usuarioId: userObjId } });
           }
       
-          const publicaciones = await this.publicacionModel
-            .find(query)
-            .populate({
-              path: 'usuarioId',
-              select: 'nombreUsuario imagenPerfil',
-              strictPopulate: false,
-            })
-            .sort(sortOption)
-            .skip(offset ? parseInt(offset) : 0)
-            .limit(limit ? parseInt(limit) : 10);
+          if (orden === 'likes') {
+            pipeline.push(
+              {
+                $addFields: {
+                  likesCount: { $size: { $ifNull: ['$likes', []] } }
+                }
+              },
+              {
+                $sort: { likesCount: -1, createdAt: -1 }
+              }
+            );
+          } else {
+            pipeline.push({ $sort: { createdAt: -1 } });
+          }
       
-          return publicaciones;
+          const skipVal = offset ? parseInt(offset) : 0;
+          if (skipVal > 0) {
+            pipeline.push({ $skip: skipVal });
+          }
+      
+          const limitVal = limit ? parseInt(limit) : 10;
+          if (limitVal > 0) {
+            pipeline.push({ $limit: limitVal });
+          }
+      
+          const publicaciones = await this.publicacionModel.aggregate(pipeline).exec();
+          
+          return await this.publicacionModel.populate(publicaciones, {
+            path: 'usuarioId',
+            select: 'nombreUsuario imagenPerfil',
+          }) as any;
         } catch (error: any) {
           console.error(' Error en obtenerTodas:', error);
           throw new HttpException(
@@ -145,26 +162,43 @@ export class PublicacionesService {
         try {
           const { limit, orden } = options;
       
-          const sortOption: Record<string, SortOrder> =
-            orden === 'likes' ? { likes: -1 } : { createdAt: -1 };
-      
-          
-          const publicaciones = await this.publicacionModel
-            .find({
+          const pipeline: any[] = [];
+          const userObjId = Types.ObjectId.isValid(usuarioId) ? new Types.ObjectId(usuarioId) : usuarioId;
+          pipeline.push({
+            $match: {
               $or: [
-                { usuarioId }, 
-                { usuarioId: new Types.ObjectId(usuarioId) }, 
-              ],
-            })
-            .populate({
-              path: 'usuarioId',
-              select: 'nombreUsuario imagenPerfil',
-              strictPopulate: false,
-            })
-            .sort(sortOption)
-            .limit(limit ? parseInt(limit) : 10);
+                { usuarioId: usuarioId },
+                { usuarioId: userObjId }
+              ]
+            }
+          });
       
-          return publicaciones;
+          if (orden === 'likes') {
+            pipeline.push(
+              {
+                $addFields: {
+                  likesCount: { $size: { $ifNull: ['$likes', []] } }
+                }
+              },
+              {
+                $sort: { likesCount: -1, createdAt: -1 }
+              }
+            );
+          } else {
+            pipeline.push({ $sort: { createdAt: -1 } });
+          }
+      
+          const limitVal = limit ? parseInt(limit) : 10;
+          if (limitVal > 0) {
+            pipeline.push({ $limit: limitVal });
+          }
+      
+          const publicaciones = await this.publicacionModel.aggregate(pipeline).exec();
+          
+          return await this.publicacionModel.populate(publicaciones, {
+            path: 'usuarioId',
+            select: 'nombreUsuario imagenPerfil',
+          }) as any;
         } catch (error: any) {
           throw new HttpException(
             'Error interno al obtener publicaciones del usuario: ' + error.message,
