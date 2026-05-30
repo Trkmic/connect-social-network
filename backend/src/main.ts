@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -9,6 +8,8 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 async function bootstrap() {
   dotenv.config();
+
+  const { AppModule } = require('./app.module');
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
