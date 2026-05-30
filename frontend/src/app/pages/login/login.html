@@ -7,7 +7,7 @@
     </div>
   </div>
 
-  <div class="login-container bg-white p-4 rounded shadow-sm">
+  <div class="login-container p-4">
 
     <h1 class="text-center mb-3 text-primary fw-bold">Iniciar sesión</h1>
 
@@ -33,7 +33,7 @@
             Este campo es obligatorio
           </div>
           <div *ngIf="loginForm.get('password')?.errors?.['minlength']">
-            La contraseña debe tener al menos 8 caracteres, una mayúscula y un número.
+            La contraseña debe tener al menos 6 caracteres.
           </div>
         </div>
       </div>

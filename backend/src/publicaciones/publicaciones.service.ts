@@ -58,21 +58,21 @@ export class PublicacionesService {
       }
 
       async eliminar(publicacionId: string, userId: string): Promise<any> {
-        // 1. Buscar la publicación
+        // Buscar la publicación
         const publicacion = await this.publicacionModel.findById(publicacionId).exec();
 
         if (!publicacion) {
             throw new NotFoundException(`Publicación con ID ${publicacionId} no encontrada.`);
         }
 
-        // 2. Obtener el ID del propietario y el usuario que intenta eliminar
+        // Obtener el ID del propietario y el usuario que intenta eliminar
         const ownerId = publicacion.usuarioId ? publicacion.usuarioId.toString() : null;
         
-        // 3. Buscar el usuario solicitante para verificar si es Admin
+        // Busca el usuario solicitante para verificar si es Admin
         const user = await this.userModel.findById(userId).exec();
         
         const isOwner = ownerId === userId;
-        const isAdmin = user && user.nombreUsuario === 'pedrooo10'; 
+        const isAdmin = user && user.perfil === 'administrador'; 
 
 
         if (!isOwner && !isAdmin) {
@@ -173,7 +173,7 @@ export class PublicacionesService {
         }
       }
 
-      async actualizar(id: string, userId: string, data: { titulo?: string; mensaje?: string }) {
+      async actualizar(id: string, userId: string, data: { titulo?: string; mensaje?: string; imagen?: string }) {
         
         const user = await this.userModel.findById(userId);
         if (!user) {
@@ -183,6 +183,13 @@ export class PublicacionesService {
         const publicacion = await this.publicacionModel.findById(id);
         if (!publicacion) {
             throw new NotFoundException('Publicación no encontrada');
+        }
+
+        const isOwner = publicacion.usuarioId.toString() === userId;
+        const isAdmin = user.perfil === 'administrador';
+
+        if (!isOwner && !isAdmin) {
+            throw new ForbiddenException('No tienes permiso para actualizar esta publicación.');
         }
 
         return this.publicacionModel.findByIdAndUpdate(id, data, { new: true });

@@ -53,6 +53,14 @@ export class Navbar {
     });
   }
 
+  clickLogo() {
+    if (this.auth.isLoggedIn()) {
+      this.router.navigate(['/publicaciones']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
   navegador(ruta: string) {
     this.router.navigate([`/${ruta}`]);
   }

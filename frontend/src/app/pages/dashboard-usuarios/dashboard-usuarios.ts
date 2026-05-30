@@ -23,7 +23,6 @@ export class DashboardUsuariosComponent implements OnInit {
     error: string | null = null;
     registroExitoso: boolean = false;
 
-    // Formulario de Registro para nuevos usuarios
     registroForm = this.fb.group({
         nombre: ['', Validators.required],
         apellido: ['', Validators.required],
@@ -31,9 +30,9 @@ export class DashboardUsuariosComponent implements OnInit {
         nombreUsuario: ['', Validators.required],
         password: ['', [Validators.required, Validators.minLength(6)]],
         repeatPassword: ['', [Validators.required, Validators.minLength(6)]],
-        perfil: ['usuario', Validators.required], // Valor por defecto
-        fechaNacimiento: [''], // Opcional
-        descripcion: [''] // Opcional
+        perfil: ['usuario', Validators.required],
+        fechaNacimiento: [''], 
+        descripcion: [''] 
     });
 
     ngOnInit(): void {
@@ -58,7 +57,7 @@ export class DashboardUsuariosComponent implements OnInit {
         const nuevoEstado = !usuario.habilitado;
         this.usuariosService.toggleHabilitacion(usuario._id, nuevoEstado).subscribe({
         next: (usuarioActualizado) => {
-            // Actualizar el estado del usuario en la lista local
+
             usuario.habilitado = usuarioActualizado.habilitado;
             console.log(`Usuario ${usuarioActualizado.nombreUsuario} ${nuevoEstado ? 'habilitado' : 'deshabilitado'}`);
         },
@@ -83,12 +82,11 @@ export class DashboardUsuariosComponent implements OnInit {
             return;
         }
 
-        // El servicio llama a POST /usuarios
         this.usuariosService.crearUsuario(this.registroForm.value).subscribe({
         next: () => {
             this.registroExitoso = true;
             this.registroForm.reset({ perfil: 'usuario' }); 
-            this.cargarUsuarios(); // Recargar lista
+            this.cargarUsuarios(); 
         },
         error: (err) => {
             this.error = err.error?.message || 'Error al crear el nuevo usuario.';

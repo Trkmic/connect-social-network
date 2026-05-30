@@ -11,9 +11,9 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      'https://red-social-oaku.onrender.com', // Dominio de Render (si lo usas)
-      'http://127.0.0.1:8080',                // Para probar la PWA localmente
-      'http://localhost:8080',                // Por si acaso
+      'https://red-social-oaku.onrender.com',
+      'http://127.0.0.1:8080',                
+      'http://localhost:8080',            
       'https://red-social-sage.vercel.app',
       'http://localhost:4200'
     ],

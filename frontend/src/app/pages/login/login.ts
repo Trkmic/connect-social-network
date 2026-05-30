@@ -27,8 +27,7 @@ export class Login implements OnInit {
       emailOrUsername: [{ value: '', disabled: this.loading }, Validators.required],
       password: [{ value: '', disabled: this.loading }, [
         Validators.required,
-        Validators.minLength(8),
-        Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)
+        Validators.minLength(6)
       ]]
     });
   }

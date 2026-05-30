@@ -5,7 +5,7 @@ import {PublicacionesService,Publicacion} from '../../core/services/publicacione
 import { Types } from 'mongoose';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import Swal from 'sweetalert2';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 interface PublicacionPoblada {
   _id: string;
@@ -25,7 +25,7 @@ interface PublicacionPoblada {
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
-  imports: [CommonModule, DatePipe, ReactiveFormsModule], 
+  imports: [CommonModule, DatePipe, ReactiveFormsModule, RouterLink], 
   templateUrl: './mi-perfil.html',
   styleUrls: ['./mi-perfil.css'],
 })
@@ -88,9 +88,7 @@ export class MiPerfil implements OnInit {
     // Asignar el usuario logueado y verificar si es admin
     this.usuarioLogueado = storedUser;
 
-    if (this.usuarioLogueado.nombreUsuario === 'pedrooo10') {
-      this.isAdmin = true;
-    }
+    this.isAdmin = this.authService.esAdministrador();
 
     // Lógica para obtener el ID de la URL o el ID del usuario logueado
     this.route.params.subscribe(params => {

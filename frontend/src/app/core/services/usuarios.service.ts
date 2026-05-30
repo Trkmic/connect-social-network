@@ -29,7 +29,7 @@ export class UsuariosService {
         return this.http.put<Usuario>(url, { habilitado });
     }
     
-    // Si tienes un método para actualizar:
+    // actualizar
     actualizarUsuario(id: string, data: FormData): Observable<any> {
         return this.http.put<any>(`${this.apiUrl}/${id}`, data);
     }

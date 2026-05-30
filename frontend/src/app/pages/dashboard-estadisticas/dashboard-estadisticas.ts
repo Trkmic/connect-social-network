@@ -88,7 +88,6 @@ export class DashboardEstadisticasComponent implements OnInit {
 
     ngOnInit(): void {
         const hoy = new Date();
-        // CAMBIO: Mostrar últimos 90 días en lugar de 30
         const haceMucho = new Date(hoy.getTime() - 90 * 24 * 60 * 60 * 1000); 
         
         this.fechaFin = this.formatDate(hoy);
@@ -130,7 +129,7 @@ export class DashboardEstadisticasComponent implements OnInit {
         this.estadisticasService.getComentariosTotales(this.fechaInicio, this.fechaFin).subscribe({
             next: (data) => {
                 this.lineChartData = {
-                    labels: data.map((d: any) => d.fecha), // Fechas
+                    labels: data.map((d: any) => d.fecha),
                     datasets: [{ 
                         data: data.map((d: any) => d.cantidad), 
                         label: 'Comentarios Diarios', 

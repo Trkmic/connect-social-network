@@ -27,7 +27,7 @@ export class EstadisticasService {
         }
         if (fechaFin) {
         const endDate = new Date(fechaFin);
-        endDate.setDate(endDate.getDate() + 1); // Incluir todo el día final
+        endDate.setDate(endDate.getDate() + 1); 
         query.$lt = endDate;
         }
         return Object.keys(query).length > 0 ? { [campoFecha]: query } : {};
@@ -44,7 +44,6 @@ export class EstadisticasService {
             cantidad: { $sum: 1 },
             },
         },
-        // CORRECCIÓN: Convertir el ID a ObjectId para asegurar que coincida con la colección 'users'
         {
             $addFields: {
                 userObjectId: { $toObjectId: '$_id' }
@@ -53,7 +52,7 @@ export class EstadisticasService {
         {
             $lookup: {
             from: 'users', 
-            localField: 'userObjectId', // Usamos el campo convertido
+            localField: 'userObjectId', 
             foreignField: '_id',
             as: 'usuarioDetalle',
             },
@@ -116,7 +115,6 @@ export class EstadisticasService {
                 $project: {
                     _id: 0,
                     publicacionId: '$_id',
-                    // Usar título o un placeholder si la publicación fue eliminada
                     tituloPublicacion: { $ifNull: ['$publicacionDetalle.titulo', 'Publicación Eliminada'] },
                     cantidad: '$cantidad',
                 },

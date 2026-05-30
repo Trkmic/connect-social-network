@@ -40,7 +40,7 @@ export class Publicaciones implements OnInit {
   hasMorePosts: boolean = true; 
   scrollingLoading: boolean = false; 
   
-  // ⬇️ HostListener para detectar el scroll de la ventana
+  // HostListener para detectar el scroll de la ventana
   @HostListener('window:scroll', ['$event'])
   onScroll(event: Event): void {
       this.scrollHandler();
@@ -70,9 +70,7 @@ export class Publicaciones implements OnInit {
       this.usuarioLogueado = this.authService.getUsuarioLogueado();
       this.userId = this.usuarioLogueado?._id || this.usuarioLogueado?.id;
       
-      if (this.usuarioLogueado.nombreUsuario === 'pedrooo10') {
-        this.isAdmin = true;
-      }
+      this.isAdmin = this.authService.esAdministrador();
 
       this.cargarPublicaciones(true); 
     }, 100); 
@@ -84,11 +82,11 @@ export class Publicaciones implements OnInit {
         this.offset = 0;
         this.publicaciones = [];
         this.hasMorePosts = true;
-        this.loading = true; // loading para la carga inicial
+        this.loading = true; 
     }
 
     if (!this.hasMorePosts || this.scrollingLoading) {
-      // Si no es un reset, salimos si no hay más o está cargando
+
       if (!reset) return; 
   }
   
@@ -235,14 +233,14 @@ export class Publicaciones implements OnInit {
       if (result.isConfirmed) {
         this.pubService.eliminarPublicacion(id).subscribe({
           next: () => {
-            // Quitamos el post de la lista
+
             this.publicaciones = this.publicaciones.filter(p => p._id !== id);
             
-            // Si la lista tiene menos posts que el límite, forzamos una recarga para llenar el hueco
+
             if (this.publicaciones.length < this.limit) {
                 this.cargarPublicaciones(true);
             } else {
-                this.offset = this.publicaciones.length; // Ajustar el offset
+                this.offset = this.publicaciones.length; 
             }
 
             Swal.fire('Eliminada', 'La publicación fue eliminada con éxito.', 'success');
@@ -290,7 +288,7 @@ export class Publicaciones implements OnInit {
         this.loadingEdit = false;
         this.idPostEditando = null; 
         this.selectedFileEdit = null;
-        this.cargarPublicaciones(true); // ⬅️ Recargar desde el inicio
+        this.cargarPublicaciones(true); 
         Swal.fire('¡Actualizado!', 'Publicación modificada.', 'success');
       },
       error: (err) => {

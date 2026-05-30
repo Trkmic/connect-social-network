@@ -1,83 +1,90 @@
+.app-background {
+  min-height: 100vh;
+  padding: 50px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .registro-container {
-  background: rgba(255, 255, 255, 0.85); 
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-premium);
   max-width: 650px;
-  border-radius: 20px;
-  padding: 2rem;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  width: 100%;
+  padding: 2.5rem !important;
+  transition: var(--transition-smooth);
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 .registro-container:hover {
   transform: translateY(-4px);
-  box-shadow: 0 14px 50px rgba(0, 0, 0, 0.2);
+  border-color: rgba(168, 85, 247, 0.35);
+  box-shadow: 0 15px 45px rgba(168, 85, 247, 0.15);
 }
 
 .registro-container h1 {
-  color: #0077ff;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 1.5rem;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 2.25rem;
 }
 
-.registro-container .form-control,
-.registro-container .form-select,
-.registro-container textarea {
-  border-radius: 12px;
-  border: 1px solid #d1d9e6;
-  padding: 0.75rem 1rem;
-  transition: all 0.25s ease;
-}
-
-.registro-container .form-control:focus,
-.registro-container .form-select:focus,
-.registro-container textarea:focus {
-  border-color: #0077ff;
-  box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.2);
-  outline: none;
+.text-danger {
+  color: #ff6b6b !important;
+  font-weight: 500;
 }
 
 .registro-container button[type="submit"] {
-  background: linear-gradient(135deg, #0077ff, #005ad4);
+  background: var(--accent-gradient) !important;
   color: #fff;
   font-weight: 600;
-  border-radius: 12px;
+  border-radius: var(--border-radius-md);
   padding: 0.9rem;
   font-size: 1rem;
-  transition: all 0.25s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  transition: var(--transition-smooth);
   border: none;
   width: 100%;
   margin-top: 1.5rem;
 }
 
 .registro-container button[type="submit"]:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(0, 119, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
   cursor: pointer;
 }
 
 .registro-container button[type="submit"]:disabled {
-  background: #ccc !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.3) !important;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 input[type="file"] {
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.75rem;
 }
 
 input[type="file"]::-webkit-file-upload-button {
-  background: #0077ff;
+  background: var(--accent-gradient);
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transition-smooth);
 }
 
 input[type="file"]::-webkit-file-upload-button:hover {
-  background: #005ad4;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
 }
 
 .registro-container img {
@@ -85,7 +92,13 @@ input[type="file"]::-webkit-file-upload-button:hover {
   width: 120px;
   height: 120px;
   object-fit: cover;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  border: 2px solid #0077ff;
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+  border: 2px solid rgba(168, 85, 247, 0.6);
   margin-top: 1rem;
+  transition: var(--transition-smooth);
+}
+
+.registro-container img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
 }

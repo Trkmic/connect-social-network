@@ -25,7 +25,6 @@ export class AuthService {
     private router: Router
   )
     {
-      // 💡 Si hay un token, iniciamos el chequeo proactivo
       if (this.getToken()) {
           this.startProactiveCheck();
       }
@@ -46,9 +45,8 @@ export class AuthService {
           localStorage.setItem('token', res.token);
           localStorage.setItem('usuario', JSON.stringify(usuario));
         
-          // 🟢 INICIAR LA COMPROBACIÓN PROACTIVA
           this.startProactiveCheck();
-          // ⚠️ Mantener startSessionTimers() si quieres la advertencia visual.
+        
           this.startSessionTimers(); 
         }
       })
@@ -56,17 +54,15 @@ export class AuthService {
   }
 
   logout(showModal = true) { 
-    // 🔴 DETENER TODOS LOS TIMERS
     this.stopSessionTimers(); 
-    this.stopProactiveCheck(); // 🆕 DETENER EL CHEQUEO PROACTIVO
+    this.stopProactiveCheck(); 
     
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
     
-    // ⚠️ Lógica de Modal (para expiración o cierre manual)
     if (showModal) {
         Swal.fire({
-            title: 'Sesión Expirada', // Usamos este título para el logout manual y el expirado
+            title: 'Sesión Expirada', 
             text: 'Tu sesión ha caducado. Por favor, vuelve a iniciar sesión.', 
             icon: 'warning',
             confirmButtonText: 'Aceptar',
@@ -75,7 +71,6 @@ export class AuthService {
             this.router.navigate(['/login']);
         });
     } else {
-        // Navegación directa (usado por el Interceptor si ya mostró el modal)
         this.router.navigate(['/login']);
     }
   }
@@ -225,7 +220,6 @@ export class AuthService {
         // Decodifica el token para obtener el payload
         const payload: any = jwtDecode(token);
         
-        // Verifica el campo 'perfil' que añadimos en el backend
         return payload.perfil === 'administrador';
     } catch (error) {
         console.error('Error al decodificar el token:', error);
@@ -234,16 +228,13 @@ export class AuthService {
   }
 
   startProactiveCheck(): void {
-    this.stopProactiveCheck(); // Limpiar chequeo anterior
+    this.stopProactiveCheck(); 
 
     this.sessionProactiveCheckSubscription = interval(this.PROACTIVE_CHECK_INTERVAL)
       .pipe(
-        // Llamamos al endpoint de refresh. Si el token falla, el Interceptor capturará el 401.
         switchMap(() => this.http.post<any>(`${this.baseUrl}/auth/refresh`, {})
           .pipe(
-            // Capturamos errores de red/server que no sean 401
             catchError(error => {
-                // El error 401 es manejado por el Interceptor (no rompemos la cadena aquí).
                 return of(null); 
             })
           )
@@ -256,7 +247,7 @@ export class AuthService {
                 localStorage.setItem('token', res.token);
             }
           },
-          error: (err) => {} // Los errores 401 son manejados por el Interceptor global
+          error: (err) => {} 
       });
 }
 

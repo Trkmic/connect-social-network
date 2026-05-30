@@ -1,93 +1,120 @@
 .dashboard-container {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 40px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-premium);
+    color: var(--text-main);
+    transition: var(--transition-smooth);
+}
+
+.dashboard-container:hover {
+    border-color: rgba(168, 85, 247, 0.25);
 }
 
 header h2 {
-    color: #333;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 15px;
-    margin-bottom: 20px;
+    font-size: 2rem;
+    font-weight: 800;
     text-align: center;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 15px;
+    margin-bottom: 25px;
 }
 
 h3 {
-    color: #555;
+    color: var(--text-main);
+    font-size: 1.35rem;
+    font-weight: 700;
     margin-top: 30px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 /* --- Formulario de Registro --- */
 .registro-form {
-    display: grid;
-    gap: 15px;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--border-radius-lg);
 }
 
 .form-group {
     display: flex;
-    gap: 10px;
+    gap: 1rem;
+    align-items: center;
 }
 
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="password"],
-.form-group input[type="date"],
-.form-group textarea {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+.form-group label {
+    color: var(--text-muted);
+    font-weight: 500;
+    min-width: 150px;
 }
 
-.form-group textarea {
-    resize: vertical;
-    min-height: 80px;
+.form-group input, .form-group textarea {
+    width: 100%;
 }
 
 .perfil-selection {
     display: flex;
     align-items: center;
     gap: 20px;
+    padding: 0.5rem 0;
 }
 
 .perfil-selection label {
-    font-weight: bold;
-    color: #333;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.perfil-selection input[type="radio"] {
+    accent-color: #a855f7;
+    width: 18px;
+    height: 18px;
 }
 
 .registro-form button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
+    background: var(--accent-gradient) !important;
     border: none;
-    border-radius: 4px;
+    color: white;
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
+    padding: 0.75rem;
     cursor: pointer;
-    transition: background-color 0.3s;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+    transition: var(--transition-smooth);
+    width: 100%;
 }
 
 .registro-form button:hover:not(:disabled) {
-    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
 }
 
 .registro-form button:disabled {
-    background-color: #ccc;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 /* --- Listado de Usuarios --- */
-
 .user-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     margin-top: 20px;
 }
 
@@ -95,17 +122,22 @@ h3 {
     display: grid;
     grid-template-columns: 2fr 3fr 1fr 1fr 1fr;
     align-items: center;
-    padding: 10px 15px;
-    background-color: #fff;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: var(--border-radius-md);
+    transition: var(--transition-smooth);
+}
+
+.user-item:not(.header-row):hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .user-item.header-row {
-    background-color: #e9ecef;
+    background: rgba(255, 255, 255, 0.06);
     font-weight: bold;
-    border-bottom: 2px solid #ddd;
-    box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
 .user-item span {
@@ -116,48 +148,76 @@ h3 {
 
 /* Estilos de estado */
 .habilitado {
-    color: green;
-    font-weight: bold;
+    color: #10b981;
+    font-weight: 600;
 }
 
 .deshabilitado {
-    color: red;
-    font-weight: bold;
+    color: #ef4444;
+    font-weight: 600;
 }
 
 /* Botones de acción */
 .user-item button {
-    padding: 8px 12px;
+    padding: 6px 12px;
     border: none;
-    border-radius: 4px;
+    border-radius: var(--border-radius-md);
     color: white;
     cursor: pointer;
-    transition: background-color 0.3s;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: var(--transition-smooth);
+    width: 100px;
+    margin-left: auto;
 }
 
 .btn-deshabilitar {
-    background-color: #dc3545; /* Rojo */
+    background: var(--danger-gradient) !important;
+    box-shadow: 0 4px 10px rgba(244, 63, 94, 0.2);
 }
 
 .btn-deshabilitar:hover {
-    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(244, 63, 94, 0.4);
 }
 
 .btn-habilitar {
-    background-color: #28a745; /* Verde */
+    background: var(--success-gradient) !important;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);
 }
 
 .btn-habilitar:hover {
-    background-color: #1e7e34;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
 }
 
 /* Mensajes */
 .error-message {
-    color: #dc3545;
-    font-weight: bold;
+    color: #ff6b6b;
+    font-weight: 600;
+    margin: 0;
 }
 
 .success-message {
-    color: #28a745;
-    font-weight: bold;
+    color: #10b981;
+    font-weight: 600;
+    margin: 0;
+}
+
+hr {
+    border-top: 1px solid rgba(255,255,255,0.08) !important;
+    margin: 2.5rem 0 !important;
+    opacity: 1 !important;
+}
+
+@media (max-width: 768px) {
+    .user-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .user-item button {
+        margin: 0 auto;
+    }
 }

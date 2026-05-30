@@ -14,8 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(payload: any) {
-        // 🛡️ VALIDACIÓN DE SEGURIDAD
-        // Si el token no tiene 'sub' (ID de usuario), lo rechazamos.
+        // Si el token no tiene 'sub' (ID de usuario), lo rechaza.
         if (!payload.sub) {
             throw new UnauthorizedException('Token inválido: falta el ID de usuario (sub)');
         }

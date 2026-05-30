@@ -2,12 +2,15 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Comentario } from './comentario.schema';
+import { User } from '../auth/user.schema';
 
 @Injectable()
 export class ComentariosService {
     constructor(
         @InjectModel(Comentario.name)
         private readonly comentarioModel: Model<Comentario>,
+        @InjectModel(User.name)
+        private readonly userModel: Model<User>,
     ) {}
 
     async getPorPublicacion(
@@ -52,5 +55,27 @@ export class ComentariosService {
         await comentario.save();
         
         return this.comentarioModel.findById(comentarioId).populate('usuarioId', 'nombreUsuario imagenPerfil');
+    }
+
+    async eliminar(comentarioId: string, userId: string) {
+        const comentario = await this.comentarioModel.findById(comentarioId);
+        if (!comentario) {
+            throw new NotFoundException('Comentario no encontrado');
+        }
+
+        const user = await this.userModel.findById(userId);
+        if (!user) {
+            throw new UnauthorizedException('Usuario no válido');
+        }
+
+        const isAuthor = comentario.usuarioId.toString() === userId;
+        const isAdmin = user.perfil === 'administrador';
+
+        if (!isAuthor && !isAdmin) {
+            throw new UnauthorizedException('No tienes permiso para eliminar este comentario');
+        }
+
+        await this.comentarioModel.deleteOne({ _id: comentarioId });
+        return { message: 'Comentario eliminado con éxito' };
     }
 }

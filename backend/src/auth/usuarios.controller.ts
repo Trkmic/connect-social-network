@@ -1,4 +1,4 @@
-import { Controller, Get, Param, NotFoundException, Put, Body, UseInterceptors, UploadedFile, UseGuards, Post, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Param, NotFoundException, Put, Body, UseInterceptors, UploadedFile, UseGuards, Post, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from './user.schema';
@@ -74,14 +74,20 @@ export class UsuariosController {
         return userUpdated;
     }
 
-    @UseGuards(AdminGuard)
     @Put(':id')
     @UseInterceptors(FileInterceptor('imagenPerfil', { storage: memoryStorage() }))
     async actualizarUsuario(
         @Param('id') id: string,
         @UploadedFile() file: Express.Multer.File, 
-        @Body() data: any, 
+        @Body() data: any,
+        @GetUser() loggedUser: any,
     ) {
+        const isSelf = loggedUser._id.toString() === id;
+        const isAdmin = loggedUser.perfil === 'administrador';
+
+        if (!isSelf && !isAdmin) {
+            throw new ForbiddenException('No tienes permiso para actualizar este perfil.');
+        }
         
         if (file) {
             try {

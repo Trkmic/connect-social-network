@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Param, Query, Body, UseGuards, Request, ParseIntPipe, DefaultValuePipe, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards, Request, ParseIntPipe, DefaultValuePipe, HttpException, HttpStatus } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { ComentariosService } from './comentarios.service';
 
@@ -41,5 +41,15 @@ export class ComentariosController {
     ) {
         const userId = req.user._id;
         return this.comentariosService.editar(comentarioId, userId, texto);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete(':id')
+    async eliminar(
+        @Param('id') comentarioId: string,
+        @Request() req: any,
+    ) {
+        const userId = req.user._id;
+        return this.comentariosService.eliminar(comentarioId, userId);
     }
 }

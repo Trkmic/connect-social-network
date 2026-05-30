@@ -46,6 +46,7 @@ export class PublicacionDetalle implements OnInit {
   publicacion: Publicacion | null = null;
   comentarios: Comentario[] = [];
   usuarioLogueado: any = null;
+  isAdmin = false;
   
   // Paginación de comentarios
   private readonly limitComentarios = 5;
@@ -73,24 +74,25 @@ export class PublicacionDetalle implements OnInit {
 
   ngOnInit(): void {
     this.usuarioLogueado = this.authService.getUsuarioLogueado();
+    this.isAdmin = this.authService.esAdministrador();
     const publicacionId = this.route.snapshot.paramMap.get('id');
 
     if (publicacionId) {
-      this.loadingPublicacion = true; // 🟢 Iniciar carga al buscar la publicación
+      this.loadingPublicacion = true; 
 
       this.pubService.getPublicacionPorId(publicacionId).subscribe({
         next: (pub) => {
           this.publicacion = pub;
-          this.loadingPublicacion = false; // 🔴 Finalizar carga si es exitoso
+          this.loadingPublicacion = false;
           this.cargarComentarios();
         },
         error: () => {
             this.publicacion = null;
-            this.loadingPublicacion = false; // 🔴 Finalizar carga en error
+            this.loadingPublicacion = false;
         } 
       });
     } else {
-        this.loadingPublicacion = false; // No hay ID, no hay carga
+        this.loadingPublicacion = false; 
     }
   }
 
@@ -171,6 +173,31 @@ export class PublicacionDetalle implements OnInit {
         this.comentarios[index] = comentarioEditado;
       }
       this.cancelarEdicion();
+    });
+  }
+
+  eliminarComentario(comentarioId: string): void {
+    Swal.fire({
+      title: '¿Seguro que deseas eliminar este comentario?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.pubService.eliminarComentario(comentarioId).subscribe({
+          next: () => {
+            this.comentarios = this.comentarios.filter(c => c._id !== comentarioId);
+            Swal.fire('Eliminado', 'El comentario fue eliminado con éxito.', 'success');
+          },
+          error: (err) => {
+            Swal.fire('Error', 'Ocurrió un problema al eliminar el comentario.', 'error');
+          }
+        });
+      }
     });
   }
 }

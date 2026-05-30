@@ -1,0 +1,62 @@
+.app-loader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background: #0a0b16;
+    color: #f8fafc;
+    gap: 1.5rem;
+}
+
+.loader-glow {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.loader-glow::before, .loader-glow::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    inset: 0;
+    border: 3px solid transparent;
+}
+
+.loader-glow::before {
+    border-top-color: #6366f1;
+    border-bottom-color: #a855f7;
+    animation: rotate 1.5s linear infinite;
+}
+
+.loader-glow::after {
+    border-left-color: #d946ef;
+    border-right-color: #ec4899;
+    animation: rotate-reverse 1s linear infinite;
+    transform: scale(0.85);
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes rotate-reverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.loader-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}

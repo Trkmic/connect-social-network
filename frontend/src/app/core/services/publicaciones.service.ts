@@ -35,7 +35,7 @@ export class PublicacionesService {
         limit = 10
     ): Observable<Publicacion[]> {
         return this.http.get<Publicacion[]>(
-        `${this.baseUrl}?orden=${orden}&offset=${offset}&limit=${limit}` // ⬅️ Correcto
+        `${this.baseUrl}?orden=${orden}&offset=${offset}&limit=${limit}` 
         );
     }
 
@@ -118,5 +118,9 @@ export class PublicacionesService {
         return this.http.put<Comentario>(`${this.comentariosUrl}/${comentarioId}`, {
             texto,
         });
+    }
+
+    eliminarComentario(comentarioId: string): Observable<any> {
+        return this.http.delete(`${this.comentariosUrl}/${comentarioId}`);
     }
 }

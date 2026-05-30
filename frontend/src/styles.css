@@ -1,51 +1,186 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-    --color-primary: #0077ff;
-    --color-primary-dark: #005ecc;
-    --color-text: #222;
-    --color-muted: #666;
-    --border-radius: 10px;
-    --transition: all 0.25s ease;
+    --bg-primary: #0a0b16;
+    --bg-gradient: radial-gradient(circle at top right, #1e1b4b, #0f172a, #090514);
+    --glass-bg: rgba(17, 18, 36, 0.45);
+    --glass-bg-hover: rgba(25, 27, 54, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-border-focus: rgba(168, 85, 247, 0.4);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --color-primary: #8b5cf6;
+    --color-primary-dark: #7c3aed;
+    --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #d946ef 100%);
+    --danger-gradient: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --shadow-premium: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --border-radius-lg: 20px;
+    --border-radius-md: 12px;
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Outfit', sans-serif;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    overflow-x: hidden;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: var(--transition-smooth);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.4);
 }
 
 .app-background {
     min-height: 100vh;
     width: 100%;
-    background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a18cd1, #fbc2eb);
-    background-size: 400% 400%;
-    animation: gradientBG 20s ease infinite;
-  }
-  
-  @keyframes gradientBG {
-    0% { background-position:0% 50%; }
-    50% { background-position:100% 50%; }
-    100% { background-position:0% 50%; }
-  }
-  
-  body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-  }
-  
-  
-  main, app-navbar, app-footer {
-    width: 100%;
-  }
+    background: var(--bg-gradient);
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+}
 
-h1, h2 {
-    font-weight: 600;
-    margin-bottom: 1rem;
-    color: var(--color-text);
+/* Glassmorphism Card Style */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-premium);
+    padding: 2rem;
+    transition: var(--transition-smooth);
+}
+
+.glass-card:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+}
+
+/* Styled Inputs */
+.form-control, .form-select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-main) !important;
+    border-radius: var(--border-radius-md) !important;
+    padding: 0.75rem 1rem !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: var(--glass-border-focus) !important;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.25) !important;
+    outline: none !important;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.7;
+}
+
+/* Premium Buttons */
+.btn-primary {
+    background: var(--accent-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-md) !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3) !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5) !important;
+}
+
+.btn-primary:active:not(:disabled) {
+    transform: translateY(0) !important;
+}
+
+.btn-danger {
+    background: var(--danger-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-md) !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(244, 63, 94, 0.3) !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.btn-danger:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(244, 63, 94, 0.5) !important;
+}
+
+.btn-success {
+    background: var(--success-gradient) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-md) !important;
+    padding: 0.75rem 1.5rem !important;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.btn-success:hover:not(:disabled) {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5) !important;
+}
+
+.btn-outline-secondary {
+    background: transparent !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: var(--text-main) !important;
+    border-radius: var(--border-radius-md) !important;
+    padding: 0.75rem 1.5rem !important;
+    transition: var(--transition-smooth) !important;
+}
+
+.btn-outline-secondary:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .app-loader {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; 
-  width: 100vw;
-  background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background: var(--bg-primary);
+    color: var(--text-main);
+}
+
+.spinner-border {
+    border-width: 0.2em;
+    width: 3rem;
+    height: 3rem;
+    color: #a855f7 !important;
 }

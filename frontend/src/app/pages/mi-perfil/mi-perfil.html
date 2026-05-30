@@ -1,5 +1,5 @@
 <div class="container my-5">
-  <div class="perfil-container card mx-auto text-center p-4 shadow-sm border-0">
+  <div class="perfil-container mx-auto text-center p-4">
     
     <div *ngIf="loadingUsuario" class="text-center p-5">
       <div class="spinner-border text-primary" role="status">
@@ -104,11 +104,13 @@
               }}</strong>
             </div>
 
-            <h5 class="fw-bold mb-2">{{ pub.titulo }}</h5>
+            <a [routerLink]="['/publicacion', pub._id]" class="text-decoration-none">
+              <h5 class="fw-bold mb-2 hover-title">{{ pub.titulo }}</h5>
+            </a>
 
             <p class="text-muted mb-2">{{ pub.mensaje }}</p>
 
-            <img [src]="pub.imagen || '/icons/default.png'" class="post-img" *ngIf="pub.imagen"/>
+            <img [src]="pub.imagen" class="post-img" *ngIf="pub.imagen"/>
 
             <div *ngIf="pub.comentarios?.length" class="comentarios mt-2">
               <h6 class="fw-semibold small text-muted mb-1">Comentarios:</h6>

@@ -61,11 +61,22 @@ export class PublicacionesController {
     }
 
     @Put(':id')
+    @UseInterceptors(FileInterceptor('imagen', { storage: memoryStorage() }))
     async actualizar(
         @Param('id') id: string,
+        @UploadedFile() file: Express.Multer.File,
         @Body() data: any, 
     ) {
-        const { userId, ...updateData } = data;
+        const userId = data.usuarioId || data.userId;
+        const updateData: any = {
+            titulo: data.titulo,
+            mensaje: data.mensaje,
+        };
+
+        if (file) {
+            const imageUrl = await this.cloudinaryService.uploadImage(file, 'publicaciones');
+            updateData.imagen = imageUrl;
+        }
 
         return this.publicacionesService.actualizar(id, userId, updateData);
     }

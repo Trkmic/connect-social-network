@@ -20,16 +20,7 @@ dotenv.config();
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    MongooseModule.forRoot(process.env.MONGO_URI!),
-    AuthModule, 
-    PublicacionesModule,
-    DatabaseModule,
-    UsuariosModule,
-    ComentariosModule,
-    CloudinaryModule,
-    EstadisticasModule,
-    LogsModule],
+    ConfigModule.forRoot({ isGlobal: true }),MongooseModule.forRoot(process.env.MONGO_URI!),AuthModule, PublicacionesModule,DatabaseModule,UsuariosModule,ComentariosModule,CloudinaryModule,EstadisticasModule,LogsModule],
   controllers: [AppController], 
   providers: [AppService], 
 })

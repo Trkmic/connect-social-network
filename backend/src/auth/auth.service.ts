@@ -80,13 +80,10 @@ export class AuthService {
     }
     
     async login(user: UserDocument) {
-        // 1. Logear el ingreso
         await this.logsService.logLogin(user._id.toString()); 
         
-        // 2. Generar el JWT
         const token = await this.generateJwt(user);
         
-        // 3. Devolver el usuario (sin password) y el token
         const { password, ...result } = user.toObject();
         return { user: result, token };
     }
