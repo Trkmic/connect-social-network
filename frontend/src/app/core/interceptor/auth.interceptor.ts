@@ -32,8 +32,8 @@ export const authInterceptor: HttpInterceptorFn = (
       if (error instanceof HttpErrorResponse) {
         if (error.status === 401) {
           
-          // 2. Comprobar si NO estamos ya en la ruta de login
-          if (router.url !== '/login') {
+          // 2. Comprobar si NO estamos ya en la ruta de login o registro
+          if (router.url !== '/login' && router.url !== '/registro') {
             
             // Llama a logout. showModal será true por defecto y activará el modal.
             // Esto también detiene el chequeo proactivo del AuthService.

@@ -19,16 +19,22 @@ export class App {
   private router = inject(Router);
 
   ngOnInit(): void {
-    // valida el token
-    this.authService.checkTokenValidity().subscribe((isValid) => {
-
+    if (this.authService.isLoggedIn()) {
+      this.authService.checkTokenValidity().subscribe((isValid) => {
+        this.isLoading = false;
+        if (isValid) {
+          const currentUrl = this.router.url;
+          if (currentUrl === '/' || currentUrl === '' || currentUrl === '/login' || currentUrl === '/registro') {
+            this.router.navigate(['/publicaciones']);
+          }
+        }
+      });
+    } else {
       this.isLoading = false;
-
-      if (isValid) {
-        this.router.navigate(['/publicaciones']);
-      } else {
+      const currentUrl = this.router.url;
+      if (currentUrl === '/' || currentUrl === '') {
         this.router.navigate(['/login']);
       }
-    });
+    }
   }
 }

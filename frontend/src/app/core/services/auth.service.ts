@@ -60,7 +60,10 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
     
-    if (showModal) {
+    const currentUrl = this.router.url;
+    const isPublicRoute = currentUrl === '/login' || currentUrl === '/registro';
+
+    if (showModal && !isPublicRoute) {
         Swal.fire({
             title: 'Sesión Expirada', 
             text: 'Tu sesión ha caducado. Por favor, vuelve a iniciar sesión.', 
@@ -128,7 +131,8 @@ export class AuthService {
     const userId = user?._id || user?.id;
 
     if (!token || !userId) {
-      this.logout();
+      this.stopSessionTimers();
+      this.stopProactiveCheck();
       return of(false);
     }
 
@@ -147,12 +151,15 @@ export class AuthService {
         };
 
         localStorage.setItem('usuario', JSON.stringify(usuarioFinal));
+        this.startSessionTimers();
       }),
       map(() => true), 
       catchError((error) => {
-
-        this.logout(); 
-        return of(false); 
+        if (error.status === 401 || error.status === 403) {
+          this.logout(true);
+          return of(false);
+        }
+        return of(true);
       })
     );
   }
@@ -245,11 +252,12 @@ export class AuthService {
             if (res && res.token) {
                 // Si el refresh fue exitoso, actualizamos el token
                 localStorage.setItem('token', res.token);
+                this.startSessionTimers();
             }
           },
           error: (err) => {} 
       });
-}
+  }
 
 stopProactiveCheck(): void {
     if (this.sessionProactiveCheckSubscription) {
