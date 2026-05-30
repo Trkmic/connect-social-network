@@ -32,14 +32,21 @@ export class PublicacionesService {
         try {
           const { usuario, limit, offset, orden, siguiendo, userId } = options;
       
+          console.log('obtenerTodas options:', options);
           const pipeline: any[] = [];
           if (usuario) {
             const userObjId = Types.ObjectId.isValid(usuario) ? new Types.ObjectId(usuario) : usuario;
             pipeline.push({ $match: { usuarioId: userObjId } });
           } else if (siguiendo === 'true' && userId && Types.ObjectId.isValid(userId)) {
             const userDoc = await this.userModel.findById(userId).exec();
+            console.log('userDoc found:', userDoc ? userDoc.nombreUsuario : 'null');
             const siguiendoIds = userDoc?.siguiendo || [];
-            const authorIds = [...siguiendoIds, new Types.ObjectId(userId)];
+            console.log('siguiendoIds raw:', siguiendoIds);
+            const authorIds = [
+              ...siguiendoIds.map(id => new Types.ObjectId(id.toString())),
+              new Types.ObjectId(userId)
+            ];
+            console.log('authorIds ObjectIds:', authorIds);
             pipeline.push({ $match: { usuarioId: { $in: authorIds } } });
           }
       
