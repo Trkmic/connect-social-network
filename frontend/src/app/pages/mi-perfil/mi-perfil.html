@@ -19,8 +19,16 @@
 
         <h2 class="fw-bold">{{ usuario.nombreUsuario }}</h2>
 
-        
-        
+        <!-- Contadores de Seguidores y Siguiendo -->
+        <div class="d-flex justify-content-center gap-4 my-2 text-muted small">
+          <div>
+            <strong class="text-light">{{ usuario.seguidores?.length || 0 }}</strong> seguidores
+          </div>
+          <div>
+            <strong class="text-light">{{ usuario.siguiendo?.length || 0 }}</strong> siguiendo
+          </div>
+        </div>
+
         <div *ngIf="!editando">
           <h4 *ngIf="usuario.nombre || usuario.apellido" class="fw-light text-muted mb-3">
             {{ usuario.nombre }} {{ usuario.apellido }}
@@ -38,6 +46,11 @@
         
         <button *ngIf="!editando && isOwner" (click)="editando = true" class="btn btn-outline-primary btn-sm mt-2 mb-3">
           Editar Perfil
+        </button>
+
+        <button *ngIf="!editando && !isOwner" (click)="toggleFollow()" class="btn btn-sm mt-2 mb-3"
+                [class.btn-primary]="!isFollowing" [class.btn-outline-secondary]="isFollowing">
+          {{ isFollowing ? 'Dejar de seguir' : 'Seguir' }}
         </button>
         
         <form [formGroup]="formPerfil" (ngSubmit)="guardarPerfil()" *ngIf="editando && isOwner" class="text-start mt-3">

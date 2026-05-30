@@ -9,12 +9,15 @@ import { MayusculaLetraPipe } from '../../core/pipes/mayuscula_letra.pipe';
 import { environment } from '../../../environments/environment';
 import { RouterLink } from '@angular/router'; 
 import Swal from 'sweetalert2';
+import { SkeletonLoader } from '../../components/skeleton-loader/skeleton-loader';
+import { ModeracionService } from '../../core/services/moderacion.service';
+import confetti from 'canvas-confetti';
 
 @Component({
   selector: 'app-publicaciones',
   templateUrl: './publicaciones.html',
   styleUrls: ['./publicaciones.css'],
-  imports: [RouterLink,CommonModule, ReactiveFormsModule, LimitadorCaracteresPipe, FormateoHoraPipe, MayusculaLetraPipe],
+  imports: [RouterLink,CommonModule, ReactiveFormsModule, LimitadorCaracteresPipe, FormateoHoraPipe, MayusculaLetraPipe, SkeletonLoader],
   standalone: true
 })
 
@@ -26,6 +29,7 @@ export class Publicaciones implements OnInit {
   selectedFile: File | null = null;
   environment = environment;
   ordenActual: 'fecha' | 'likes' = 'fecha';
+  feedFiltro: 'todos' | 'siguiendo' = 'todos';
   
   userId: string | null = null; 
   isAdmin = false;
@@ -49,7 +53,8 @@ export class Publicaciones implements OnInit {
   constructor(
     private fb: FormBuilder,
     private pubService: PublicacionesService,
-    private authService: AuthService
+    private authService: AuthService,
+    private moderacionService: ModeracionService
   ) {
 
     this.formPublicacion = this.fb.group({
@@ -92,8 +97,10 @@ export class Publicaciones implements OnInit {
   
     this.scrollingLoading = !reset; 
     if (this.scrollingLoading) this.loading = false;
-
-    this.pubService.obtenerPublicaciones(this.ordenActual, this.offset, this.limit).subscribe({ 
+ 
+    const sig = this.feedFiltro === 'siguiendo' ? 'true' : 'false';
+    const uid = this.userId || '';
+    this.pubService.obtenerPublicaciones(this.ordenActual, this.offset, this.limit, sig, uid).subscribe({ 
       next: (data) => {
         const newPosts = data.map(post => ({
           ...post,
@@ -143,7 +150,7 @@ export class Publicaciones implements OnInit {
   }
 
 
-  toggleLike(pub: Publicacion) {
+  toggleLike(pub: Publicacion, event?: MouseEvent) {
     if (!this.userId) {
       return;
     }
@@ -155,12 +162,12 @@ export class Publicaciones implements OnInit {
     let obs;
   
     if (liked) {
-
       this.publicaciones[index].likes = this.publicaciones[index].likes.filter(id => id !== this.userId);
       obs = this.pubService.quitarLike(pub._id, this.userId);
-
     } else {
-
+      if (event) {
+        this.triggerConfetti(event);
+      }
       this.publicaciones[index].likes.push(this.userId);
       obs = this.pubService.darLike(pub._id, this.userId);
     }
@@ -294,6 +301,47 @@ export class Publicaciones implements OnInit {
       error: (err) => {
         this.loadingEdit = false;
         Swal.fire('Error', 'No se pudo actualizar la publicación.', 'error');
+      }
+    });
+  }
+
+  triggerConfetti(event: MouseEvent) {
+    const x = event.clientX / window.innerWidth;
+    const y = event.clientY / window.innerHeight;
+    confetti({
+      particleCount: 15,
+      angle: 90,
+      spread: 45,
+      origin: { x, y },
+      colors: ['#ec4899', '#f43f5e', '#a855f7']
+    });
+  }
+
+  cambiarFiltro(nuevoFiltro: 'todos' | 'siguiendo'): void {
+    if (this.feedFiltro === nuevoFiltro) return;
+    this.feedFiltro = nuevoFiltro;
+    this.cargarPublicaciones(true);
+  }
+
+  reportarPost(pub: Publicacion) {
+    Swal.fire({
+      title: 'Reportar publicación',
+      text: 'Por favor, dinos el motivo del reporte:',
+      input: 'text',
+      inputPlaceholder: 'Ej: Spam, acoso, odio...',
+      showCancelButton: true,
+      confirmButtonText: 'Enviar reporte',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed && result.value) {
+        this.moderacionService.reportar('publicacion', pub._id, undefined, result.value).subscribe({
+          next: () => {
+            Swal.fire('Reportado', 'La publicación ha sido reportada con éxito.', 'success');
+          },
+          error: (err) => {
+            Swal.fire('Error', 'No se pudo registrar el reporte.', 'error');
+          }
+        });
       }
     });
   }

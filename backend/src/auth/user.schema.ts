@@ -36,6 +36,12 @@ export class User {
 
     @Prop()
     imagenPerfil?: string;
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+    siguiendo: Types.ObjectId[];
+
+    @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
+    seguidores: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -51,4 +57,6 @@ export interface IUser {
     perfil: 'usuario' | 'administrador';
     habilitado: boolean;
     imagenPerfil?: string;
+    siguiendo?: Types.ObjectId[];
+    seguidores?: Types.ObjectId[];
 }

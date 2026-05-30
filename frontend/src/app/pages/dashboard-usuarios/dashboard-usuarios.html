@@ -1,93 +1,188 @@
 <div class="dashboard-container">
-    <header>
-        <h2>Administración de Usuarios</h2>
+    <header class="mb-4">
+        <h2>Panel de Administración</h2>
     </header>
 
-    <section class="registro-section">
-        <h3>Formulario de Creación de Nuevo Usuario</h3>
-        <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()" class="registro-form">
-            
-            <div class="form-group">
-                <input type="text" formControlName="nombre" placeholder="Nombre" required>
-                <input type="text" formControlName="apellido" placeholder="Apellido" required>
-            </div>
+    <!-- Dashboard Tabs -->
+    <div class="dashboard-tabs mb-4">
+        <button class="tab-btn" [class.active]="activeTab === 'usuarios'" (click)="switchTab('usuarios')">
+            👥 Gestión de Usuarios
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'reportes'" (click)="switchTab('reportes')">
+            ⚠️ Reportes de Moderación
+        </button>
+    </div>
 
-            <div class="form-group">
-                <input type="email" formControlName="email" placeholder="Correo Electrónico" required>
-            </div>
-            
-            <div class="form-group">
-                <input type="text" formControlName="nombreUsuario" placeholder="Nombre de Usuario" required>
-            </div>
-
-            <div class="form-group">
-                <input type="password" formControlName="password" placeholder="Contraseña (mín. 6)" required>
-                <input type="password" formControlName="repeatPassword" placeholder="Repetir Contraseña" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="fechaNacimiento">Fecha de Nacimiento:</label>
-                <input type="date" formControlName="fechaNacimiento" id="fechaNacimiento">
-            </div>
-
-            <div class="form-group">
-                <textarea formControlName="descripcion" placeholder="Descripción (Opcional)"></textarea>
-            </div>
-
-            <div class="perfil-selection">
-                <label>Perfil:</label>
-                <label>
-                    <input type="radio" formControlName="perfil" value="usuario">
-                    Usuario
-                </label>
-                <label>
-                    <input type="radio" formControlName="perfil" value="administrador">
-                    Administrador
-                </label>
-            </div>
-
-            <p *ngIf="error" class="error-message">{{ error }}</p>
-            <p *ngIf="registroExitoso" class="success-message">Usuario creado exitosamente!</p>
-
-            <button type="submit" [disabled]="registroForm.invalid">Crear Usuario</button>
-        </form>
-    </section>
-
-    <hr>
-    
-    <section class="listado-usuarios-section">
-        <h3>Listado de Usuarios</h3>
-        
-        <p *ngIf="isLoading">Cargando usuarios...</p>
-        
-        <div class="user-list">
-            <div class="user-item header-row">
-                <span>Nombre Completo</span>
-                <span>Usuario/Email</span>
-                <span>Perfil</span>
-                <span>Estado</span>
-                <span>Acciones</span>
-            </div>
-            
-            <div *ngFor="let user of usuarios" class="user-item">
-                <span>{{ user.nombre }} {{ user.apellido }}</span>
-                <span>{{ user.nombreUsuario }} ({{ user.email }})</span>
-                <span>{{ user.perfil | uppercase }}</span>
-                <span [class.habilitado]="user.habilitado" [class.deshabilitado]="!user.habilitado">
-                    {{ user.habilitado ? 'ACTIVO' : 'DESHABILITADO' }}
-                </span>
+    <!-- Tab 1: Gestión de Usuarios -->
+    <ng-container *ngIf="activeTab === 'usuarios'">
+        <section class="registro-section">
+            <h3>Formulario de Creación de Nuevo Usuario</h3>
+            <form [formGroup]="registroForm" (ngSubmit)="onSubmitRegistro()" class="registro-form">
                 
-                <button 
-                    [class.btn-deshabilitar]="user.habilitado"
-                    [class.btn-habilitar]="!user.habilitado"
-                    (click)="toggleHabilitacion(user)"
-                >
-                    {{ user.habilitado ? 'Deshabilitar' : 'Habilitar' }}
-                </button>
-            </div>
-        </div>
+                <div class="form-group">
+                    <input type="text" formControlName="nombre" placeholder="Nombre" required>
+                    <input type="text" formControlName="apellido" placeholder="Apellido" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="email" formControlName="email" placeholder="Correo Electrónico" required>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" formControlName="nombreUsuario" placeholder="Nombre de Usuario" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" formControlName="password" placeholder="Contraseña (mín. 6)" required>
+                    <input type="password" formControlName="repeatPassword" placeholder="Repetir Contraseña" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+                    <input type="date" formControlName="fechaNacimiento" id="fechaNacimiento">
+                </div>
+
+                <div class="form-group">
+                    <textarea formControlName="descripcion" placeholder="Descripción (Opcional)"></textarea>
+                </div>
+
+                <div class="perfil-selection">
+                    <label>Perfil:</label>
+                    <label>
+                        <input type="radio" formControlName="perfil" value="usuario">
+                        Usuario
+                    </label>
+                    <label>
+                        <input type="radio" formControlName="perfil" value="administrador">
+                        Administrador
+                    </label>
+                </div>
+
+                <p *ngIf="error" class="error-message">{{ error }}</p>
+                <p *ngIf="registroExitoso" class="success-message">Usuario creado exitosamente!</p>
+
+                <button type="submit" [disabled]="registroForm.invalid">Crear Usuario</button>
+            </form>
+        </section>
+
+        <hr>
         
-        <p *ngIf="!isLoading && usuarios.length === 0">No hay usuarios registrados.</p>
-    </section>
+        <section class="listado-usuarios-section">
+            <h3>Listado de Usuarios</h3>
+            
+            <p *ngIf="isLoading" class="loading-text">Cargando usuarios...</p>
+            
+            <div class="user-list" *ngIf="!isLoading && usuarios.length > 0">
+                <div class="user-item header-row">
+                    <span>Nombre Completo</span>
+                    <span>Usuario/Email</span>
+                    <span>Perfil</span>
+                    <span>Estado</span>
+                    <span>Acciones</span>
+                </div>
+                
+                <div *ngFor="let user of usuarios" class="user-item">
+                    <span>{{ user.nombre }} {{ user.apellido }}</span>
+                    <span>{{ user.nombreUsuario }} ({{ user.email }})</span>
+                    <span>{{ user.perfil | uppercase }}</span>
+                    <span [class.habilitado]="user.habilitado" [class.deshabilitado]="!user.habilitado">
+                        {{ user.habilitado ? 'ACTIVO' : 'DESHABILITADO' }}
+                    </span>
+                    
+                    <button 
+                        [class.btn-deshabilitar]="user.habilitado"
+                        [class.btn-habilitar]="!user.habilitado"
+                        (click)="toggleHabilitacion(user)"
+                    >
+                        {{ user.habilitado ? 'Deshabilitar' : 'Habilitar' }}
+                    </button>
+                </div>
+            </div>
+            
+            <p *ngIf="!isLoading && usuarios.length === 0" class="no-users">No hay usuarios registrados.</p>
+        </section>
+    </ng-container>
+
+    <!-- Tab 2: Reportes de Moderación -->
+    <ng-container *ngIf="activeTab === 'reportes'">
+        <section class="listado-reportes-section">
+            <h3>Reportes de Contenido Recibidos</h3>
+            
+            <p *ngIf="isLoading" class="loading-text">Cargando reportes...</p>
+            <p *ngIf="error" class="error-message">{{ error }}</p>
+            
+            <div class="report-list" *ngIf="!isLoading && reportes.length > 0">
+                <div class="report-item header-row">
+                    <span>Reportero</span>
+                    <span>Tipo</span>
+                    <span>Contenido Reportado</span>
+                    <span>Motivo</span>
+                    <span>Estado</span>
+                    <span>Acciones</span>
+                </div>
+                
+                <div *ngFor="let reporte of reportes" class="report-item" [class.resuelto-row]="reporte.estado !== 'pendiente'">
+                    <span>{{ reporte.reporteroId?.nombreUsuario || 'Usuario Desconocido' }}</span>
+                    <span>
+                        <span class="report-badge" [ngClass]="reporte.tipo === 'publicacion' ? 'badge-info' : 'badge-warning'">
+                            {{ reporte.tipo | uppercase }}
+                        </span>
+                    </span>
+                    
+                    <span class="content-cell">
+                        <!-- For publications -->
+                        <ng-container *ngIf="reporte.tipo === 'publicacion'">
+                            <div *ngIf="reporte.publicacionId; else postEliminado">
+                                <strong class="text-white">{{ reporte.publicacionId.titulo }}</strong>
+                                <p class="small-desc text-muted mb-0">{{ reporte.publicacionId.mensaje }}</p>
+                            </div>
+                            <ng-template #postEliminado>
+                                <span class="text-muted italic">[Publicación eliminada]</span>
+                            </ng-template>
+                        </ng-container>
+
+                        <!-- For comments -->
+                        <ng-container *ngIf="reporte.tipo === 'comentario'">
+                            <div *ngIf="reporte.comentarioId; else comentarioEliminado">
+                                <strong class="text-white">{{ reporte.comentarioId.usuarioId?.nombreUsuario || 'Comentador' }}</strong>
+                                <p class="small-desc text-muted mb-0">{{ reporte.comentarioId.texto }}</p>
+                            </div>
+                            <ng-template #comentarioEliminado>
+                                <span class="text-muted italic">[Comentario eliminado]</span>
+                            </ng-template>
+                        </ng-container>
+                    </span>
+
+                    <span>{{ reporte.motivo }}</span>
+
+                    <span>
+                        <span class="report-badge" [ngClass]="{
+                            'badge-danger': reporte.estado === 'pendiente',
+                            'badge-success': reporte.estado === 'resuelto',
+                            'badge-secondary': reporte.estado === 'descartado'
+                        }">
+                            {{ reporte.estado | uppercase }}
+                        </span>
+                    </span>
+                    
+                    <span class="report-actions d-flex gap-2 justify-content-center">
+                        <ng-container *ngIf="reporte.estado === 'pendiente'">
+                            <button class="btn-resolver btn-eliminar-content" (click)="resolverReporte(reporte._id, 'eliminar')">
+                                🗑️ Eliminar
+                            </button>
+                            <button class="btn-resolver btn-descartar-report" (click)="resolverReporte(reporte._id, 'descartar')">
+                                ✅ Descartar
+                            </button>
+                        </ng-container>
+                        <ng-container *ngIf="reporte.estado !== 'pendiente'">
+                            <span class="text-muted">-</span>
+                        </ng-container>
+                    </span>
+                </div>
+            </div>
+            
+            <p *ngIf="!isLoading && reportes.length === 0" class="no-reports">No hay reportes de moderación registrados.</p>
+        </section>
+    </ng-container>
 
 </div>

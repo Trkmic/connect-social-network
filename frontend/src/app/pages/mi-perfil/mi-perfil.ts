@@ -38,6 +38,8 @@ export class MiPerfil implements OnInit {
     fechaNacimiento?: string; 
     descripcion?: string;
     imagenPerfil?: string;
+    seguidores?: string[];
+    siguiendo?: string[];
   } | null = null;
 
   publicaciones: PublicacionPoblada[] = [];
@@ -49,6 +51,7 @@ export class MiPerfil implements OnInit {
 
   isOwner = false; // Indica si el perfil visualizado es el del usuario logueado
   isAdmin = false; // Indica si el usuario logueado es admin
+  isFollowing = false; // Indica si el usuario logueado sigue a este perfil
   usuarioLogueado: any = null;
   userIdAVisualizar: string | null = null;
   private route = inject(ActivatedRoute);
@@ -152,8 +155,13 @@ export class MiPerfil implements OnInit {
         nombre: userFromServer.nombre, 
         apellido: userFromServer.apellido, 
         fechaNacimiento: userFromServer.fechaNacimiento, 
+        seguidores: userFromServer.seguidores || [],
+        siguiendo: userFromServer.siguiendo || [],
       };
     
+      const loggedId = (this.usuarioLogueado._id || this.usuarioLogueado.id).toString();
+      this.isFollowing = (userFromServer.seguidores || []).some((id: any) => id.toString() === loggedId);
+
       // Solo se aplica el patch si es el perfil del dueño
         if (this.isOwner) {
           this.formPerfil.patchValue({
@@ -229,5 +237,34 @@ export class MiPerfil implements OnInit {
             });
           }
         });
+  }
+
+  toggleFollow() {
+    if (!this.usuario) return;
+    const userId = this.usuario._id;
+    if (this.isFollowing) {
+      this.authService.dejarDeSeguir(userId).subscribe({
+        next: () => {
+          this.isFollowing = false;
+          const loggedId = (this.usuarioLogueado._id || this.usuarioLogueado.id).toString();
+          if (this.usuario && this.usuario.seguidores) {
+            this.usuario.seguidores = this.usuario.seguidores.filter(id => id.toString() !== loggedId);
+          }
+        },
+        error: (err) => console.error('Error al dejar de seguir:', err)
+      });
+    } else {
+      this.authService.seguir(userId).subscribe({
+        next: () => {
+          this.isFollowing = true;
+          const loggedId = (this.usuarioLogueado._id || this.usuarioLogueado.id).toString();
+          if (this.usuario) {
+            if (!this.usuario.seguidores) this.usuario.seguidores = [];
+            this.usuario.seguidores.push(loggedId);
+          }
+        },
+        error: (err) => console.error('Error al seguir:', err)
+      });
+    }
   }
 }

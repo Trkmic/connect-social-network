@@ -7,6 +7,8 @@ import { CloudinaryService } from '../cloudinary/cloudinary.service';
 import { User, UserSchema } from '../auth/user.schema';
 import { AuthModule } from '../auth/auth.module';
 import { LogsModule } from '../logs/logs.module';
+import { NotificacionesModule } from '../notificaciones/notificaciones.module';
+import { ChatModule } from '../chat/chat.module';
 
 
 @Module({
@@ -16,7 +18,9 @@ import { LogsModule } from '../logs/logs.module';
       { name: User.name, schema: UserSchema }
     ]),
     AuthModule,
-    LogsModule
+    LogsModule,
+    NotificacionesModule,
+    ChatModule
   ],
   controllers: [PublicacionesController],
   providers: [PublicacionesService, CloudinaryService],

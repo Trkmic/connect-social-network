@@ -41,8 +41,10 @@ export class PublicacionesController {
         @Query('limit') limit?: string,
         @Query('offset') offset?: string,
         @Query('orden') orden?: 'fecha' | 'likes',
+        @Query('siguiendo') siguiendo?: string,
+        @Query('userId') userId?: string,
     ) {
-        return this.publicacionesService.obtenerTodas({ usuario, limit, offset, orden });
+        return this.publicacionesService.obtenerTodas({ usuario, limit, offset, orden, siguiendo, userId });
     }
 
     @Delete(':id')

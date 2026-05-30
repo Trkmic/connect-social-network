@@ -1,0 +1,92 @@
+<div class="chat-wrapper position-fixed" [class.expanded]="isExpanded">
+  <!-- Botón flotante para abrir/cerrar -->
+  <button class="chat-trigger-btn shadow-lg" (click)="togglePanel()">
+    <span *ngIf="!isExpanded">💬 Chat</span>
+    <span *ngIf="isExpanded">✖ Cerrar</span>
+  </button>
+
+  <!-- Panel de Chat Expandido -->
+  <div *ngIf="isExpanded" class="chat-main-panel glass-card shadow-lg d-flex">
+    <!-- Columna Izquierda: Lista de Usuarios -->
+    <div class="users-list-col d-flex flex-column">
+      <div class="panel-header">
+        <h5>Contactos</h5>
+      </div>
+      <div class="users-scroll-area flex-fill">
+        <div *ngFor="let user of usuarios" class="user-item d-flex align-items-center gap-2" 
+             [class.active]="activeUser && (activeUser._id === user._id || activeUser.id === user.id)"
+             (click)="selectUser(user)">
+          <div class="user-avatar-container position-relative">
+            <img *ngIf="user.imagenPerfil" [src]="user.imagenPerfil" alt="Avatar" class="chat-avatar">
+            <div *ngIf="!user.imagenPerfil" class="chat-avatar-placeholder">👤</div>
+            <!-- Indicador Online -->
+            <span class="online-dot" [class.online]="isOnline(user)"></span>
+          </div>
+          <div class="user-info text-truncate">
+            <span class="username">&#64;{{ user.nombreUsuario }}</span>
+            <small class="name text-muted d-block">{{ user.nombre }} {{ user.apellido }}</small>
+          </div>
+        </div>
+        <div *ngIf="usuarios.length === 0" class="p-3 text-center text-muted">
+          No hay otros usuarios
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha: Ventana de Chat Activo -->
+    <div class="chat-box-col d-flex flex-column flex-fill">
+      <!-- Si hay un chat seleccionado -->
+      <ng-container *ngIf="activeUser; else noActiveChat">
+        <div class="panel-header d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <img *ngIf="activeUser.imagenPerfil" [src]="activeUser.imagenPerfil" alt="Avatar" class="chat-avatar-sm">
+            <div *ngIf="!activeUser.imagenPerfil" class="chat-avatar-placeholder-sm">👤</div>
+            <div>
+              <span class="active-username">&#64;{{ activeUser.nombreUsuario }}</span>
+              <small class="active-status text-muted d-block" *ngIf="isOnline(activeUser)">En línea</small>
+              <small class="active-status text-muted d-block" *ngIf="!isOnline(activeUser)">Desconectado</small>
+            </div>
+          </div>
+          <button class="btn btn-close-chat" (click)="closeChat()">✖</button>
+        </div>
+
+        <!-- Área de mensajes -->
+        <div #scrollMe class="chat-messages-area flex-fill p-3 d-flex flex-column gap-2">
+          <div *ngFor="let msg of mensajes" class="msg-bubble" 
+               [class.sent]="msg.emisorId === (currentUser._id || currentUser.id)"
+               [class.received]="msg.emisorId !== (currentUser._id || currentUser.id)">
+            <p class="msg-text">{{ msg.contenido }}</p>
+            <span class="msg-time">{{ msg.createdAt | date:'shortTime' }}</span>
+          </div>
+
+          <!-- Indicador escribiendo -->
+          <div *ngIf="otroUsuarioEscribiendo" class="msg-bubble received escribiendo-bubble">
+            <div class="typing-indicator">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inputs de envío -->
+        <div class="chat-input-area p-2 border-top">
+          <div class="input-group">
+            <input type="text" [(ngModel)]="nuevoMensajeText" (keypress)="onKeyPress($event)"
+                   placeholder="Escribe un mensaje..." class="form-control chat-input">
+            <button class="btn btn-send" (click)="enviarMensaje()">
+              <span>➔</span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- Si no hay chat seleccionado -->
+      <ng-template #noActiveChat>
+        <div class="no-chat-selected flex-fill d-flex flex-column align-items-center justify-content-center text-center p-4">
+          <span class="chat-icon-huge">💬</span>
+          <h5>Inicia una conversación</h5>
+          <p class="text-muted">Selecciona un contacto de la lista para empezar a chatear en tiempo real.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

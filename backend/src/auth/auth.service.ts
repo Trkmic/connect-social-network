@@ -87,4 +87,12 @@ export class AuthService {
         const { password, ...result } = user.toObject();
         return { user: result, token };
     }
+
+    async verificarToken(token: string): Promise<any> {
+        try {
+            return this.jwtService.verify(token);
+        } catch (error) {
+            return null;
+        }
+    }
 }

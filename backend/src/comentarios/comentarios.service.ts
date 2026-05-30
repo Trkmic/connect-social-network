@@ -3,6 +3,9 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Comentario } from './comentario.schema';
 import { User } from '../auth/user.schema';
+import { Publicacion } from '../publicaciones/publicacion.schema';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
+import { ChatGateway } from '../chat/chat.gateway';
 
 @Injectable()
 export class ComentariosService {
@@ -11,6 +14,10 @@ export class ComentariosService {
         private readonly comentarioModel: Model<Comentario>,
         @InjectModel(User.name)
         private readonly userModel: Model<User>,
+        @InjectModel(Publicacion.name)
+        private readonly publicacionModel: Model<Publicacion>,
+        private readonly notificacionesService: NotificacionesService,
+        private readonly chatGateway: ChatGateway,
     ) {}
 
     async getPorPublicacion(
@@ -35,6 +42,21 @@ export class ComentariosService {
                 });
 
                 const comentarioGuardado = await nuevoComentario.save();
+
+                try {
+                    const publicacion = await this.publicacionModel.findById(publicacionId).exec();
+                    if (publicacion && publicacion.usuarioId.toString() !== usuarioId) {
+                        const notif = await this.notificacionesService.crear({
+                            receptorId: publicacion.usuarioId,
+                            emisorId: new Types.ObjectId(usuarioId),
+                            tipo: 'comentario',
+                            publicacionId: publicacion._id
+                        });
+                        this.chatGateway.enviarNotificacionAUsuario(publicacion.usuarioId.toString(), notif);
+                    }
+                } catch (error) {
+                    console.error('Error al enviar notificación de comentario:', error);
+                }
 
                 return comentarioGuardado.populate('usuarioId', 'nombreUsuario imagenPerfil');
     }

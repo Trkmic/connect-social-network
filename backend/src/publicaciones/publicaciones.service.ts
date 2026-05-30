@@ -4,6 +4,8 @@ import { Model, SortOrder, Types } from 'mongoose';
 import { Publicacion } from './publicacion.schema';
 import { User , UserDocument} from '../auth/user.schema';
 import { LogsService } from '../logs/logs.service';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
+import { ChatGateway } from '../chat/chat.gateway';
 
 @Injectable()
 export class PublicacionesService {
@@ -13,6 +15,8 @@ export class PublicacionesService {
         @InjectModel(User.name) 
         private readonly userModel: Model<User>,
         private readonly logsService: LogsService,
+        private readonly notificacionesService: NotificacionesService,
+        private readonly chatGateway: ChatGateway,
       ) {}
 
     async crear(data: any): Promise<Publicacion> {
@@ -24,14 +28,19 @@ export class PublicacionesService {
         }
     }
 
-    async obtenerTodas(options: { usuario?: string; limit?: string; offset?: string; orden?: 'fecha' | 'likes'; }): Promise<Publicacion[]> {
+    async obtenerTodas(options: { usuario?: string; limit?: string; offset?: string; orden?: 'fecha' | 'likes'; siguiendo?: string; userId?: string; }): Promise<Publicacion[]> {
         try {
-          const { usuario, limit, offset, orden } = options;
+          const { usuario, limit, offset, orden, siguiendo, userId } = options;
       
           const pipeline: any[] = [];
           if (usuario) {
             const userObjId = Types.ObjectId.isValid(usuario) ? new Types.ObjectId(usuario) : usuario;
             pipeline.push({ $match: { usuarioId: userObjId } });
+          } else if (siguiendo === 'true' && userId && Types.ObjectId.isValid(userId)) {
+            const userDoc = await this.userModel.findById(userId).exec();
+            const siguiendoIds = userDoc?.siguiendo || [];
+            const authorIds = [...siguiendoIds, new Types.ObjectId(userId)];
+            pipeline.push({ $match: { usuarioId: { $in: authorIds } } });
           }
       
           if (orden === 'likes') {
@@ -115,9 +124,24 @@ export class PublicacionesService {
         const yaTieneLike = publicacion.likes.some(likeId => likeId.equals(userObjectId));
     
         if (!yaTieneLike) {
-        publicacion.likes.push(userObjectId);
-        await publicacion.save();
-        await this.logsService.logLike(userId, id);
+            publicacion.likes.push(userObjectId);
+            await publicacion.save();
+            await this.logsService.logLike(userId, id);
+
+            // Enviar notificación en tiempo real al dueño del post
+            try {
+                if (publicacion.usuarioId.toString() !== userId) {
+                    const notif = await this.notificacionesService.crear({
+                        receptorId: publicacion.usuarioId,
+                        emisorId: userObjectId,
+                        tipo: 'like',
+                        publicacionId: publicacion._id
+                    });
+                    this.chatGateway.enviarNotificacionAUsuario(publicacion.usuarioId.toString(), notif);
+                }
+            } catch (error) {
+                console.error('Error al enviar notificación de like:', error);
+            }
         }
     
         const populated = await this.publicacionModel

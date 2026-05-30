@@ -202,3 +202,50 @@ hr {
     color: var(--text-muted);
     font-weight: 500;
 }
+
+/* Feed Filter Tabs */
+.feed-tabs {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    padding: 6px;
+    border-radius: var(--border-radius-md);
+    display: inline-flex;
+    margin: 0 auto;
+    backdrop-filter: blur(10px);
+}
+
+.feed-tab-btn {
+    border: none !important;
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    font-weight: 600;
+    padding: 0.6rem 1.5rem !important;
+    border-radius: calc(var(--border-radius-md) - 2px) !important;
+    transition: var(--transition-smooth);
+    font-size: 0.95rem;
+}
+
+.feed-tab-btn:hover {
+    color: var(--text-main) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.feed-tab-btn.active {
+    background: var(--accent-gradient) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.actions .btn-outline-warning {
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+    color: #f59e0b !important;
+    background: transparent !important;
+}
+
+.actions .btn-outline-warning:hover {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+

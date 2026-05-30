@@ -1,6 +1,6 @@
 import { Controller, Get, Param, NotFoundException, Put, Body, UseInterceptors, UploadedFile, UseGuards, Post, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User, UserDocument } from './user.schema';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
@@ -11,6 +11,8 @@ import { AuthService } from './auth.service';
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { GetUser } from './jwt/get-user.decorator';
 import { LogsService } from '../logs/logs.service';
+import { NotificacionesService } from '../notificaciones/notificaciones.service';
+import { ChatGateway } from '../chat/chat.gateway';
 
 @Controller('usuarios')
 @UseGuards(JwtAuthGuard) 
@@ -20,13 +22,14 @@ export class UsuariosController {
         private readonly cloudinaryService: CloudinaryService,
         private readonly authService: AuthService, 
         private readonly logsService: LogsService,
+        private readonly notificacionesService: NotificacionesService,
+        private readonly chatGateway: ChatGateway,
     ) {}
     
     
-    @UseGuards(AdminGuard)
     @Get()
     async getAllUsuarios() {
-        const users = await this.userModel.find().select('-password');
+        const users = await this.userModel.find({ habilitado: true }).select('nombre apellido nombreUsuario imagenPerfil descripcion perfil seguidores siguiendo');
         return users;
     }
 
@@ -105,4 +108,63 @@ export class UsuariosController {
         return userUpdated;
     }
 
+    @Post(':id/seguir')
+    async seguirUsuario(@Param('id') idParaSeguir: string, @GetUser() loggedUser: any) {
+        if (loggedUser._id.toString() === idParaSeguir) {
+            throw new BadRequestException('No puedes seguirte a ti mismo.');
+        }
+
+        const usuarioLogueado = await this.userModel.findById(loggedUser._id);
+        const usuarioParaSeguir = await this.userModel.findById(idParaSeguir);
+
+        if (!usuarioLogueado || !usuarioParaSeguir) {
+            throw new NotFoundException('Usuario no encontrado');
+        }
+
+        const yaSigue = (usuarioLogueado.siguiendo || []).some(id => id.toString() === idParaSeguir);
+        if (!yaSigue) {
+            if (!usuarioLogueado.siguiendo) usuarioLogueado.siguiendo = [];
+            if (!usuarioParaSeguir.seguidores) usuarioParaSeguir.seguidores = [];
+
+            usuarioLogueado.siguiendo.push(usuarioParaSeguir._id);
+            usuarioParaSeguir.seguidores.push(usuarioLogueado._id);
+
+            await usuarioLogueado.save();
+            await usuarioParaSeguir.save();
+            
+            // Crear notificación en BD
+            const notif = await this.notificacionesService.crear({
+                receptorId: usuarioParaSeguir._id,
+                emisorId: usuarioLogueado._id,
+                tipo: 'follow'
+            });
+
+            // Emitir por WebSocket
+            this.chatGateway.enviarNotificacionAUsuario(idParaSeguir, notif);
+        }
+
+        return { message: 'Usuario seguido con éxito' };
+    }
+
+    @Post(':id/dejar-de-seguir')
+    async dejarDeSeguirUsuario(@Param('id') idParaDejar: string, @GetUser() loggedUser: any) {
+        const usuarioLogueado = await this.userModel.findById(loggedUser._id);
+        const usuarioParaDejar = await this.userModel.findById(idParaDejar);
+
+        if (!usuarioLogueado || !usuarioParaDejar) {
+            throw new NotFoundException('Usuario no encontrado');
+        }
+
+        if (usuarioLogueado.siguiendo) {
+            usuarioLogueado.siguiendo = usuarioLogueado.siguiendo.filter(id => id.toString() !== idParaDejar);
+        }
+        if (usuarioParaDejar.seguidores) {
+            usuarioParaDejar.seguidores = usuarioParaDejar.seguidores.filter(id => id.toString() !== loggedUser._id.toString());
+        }
+
+        await usuarioLogueado.save();
+        await usuarioParaDejar.save();
+
+        return { message: 'Has dejado de seguir al usuario con éxito' };
+    }
 }

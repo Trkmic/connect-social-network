@@ -20,7 +20,22 @@
 
     <h2 class="feed-title mb-4 text-center">Publicaciones</h2>
 
-    <div class="text-center mb-3 d-flex justify-content-center gap-2">
+    <!-- Feed Filter Tabs (Descubrir / Siguiendo) -->
+    <div class="feed-tabs mb-4 d-flex justify-content-center">
+      <button class="btn feed-tab-btn" 
+              [class.active]="feedFiltro === 'todos'" 
+              (click)="cambiarFiltro('todos')">
+        🌍 Descubrir
+      </button>
+      <button class="btn feed-tab-btn" 
+              [class.active]="feedFiltro === 'siguiendo'" 
+              (click)="cambiarFiltro('siguiendo')">
+        👥 Siguiendo
+      </button>
+    </div>
+
+    <!-- Sorting Controls -->
+    <div class="text-center mb-4 d-flex justify-content-center gap-2">
       <button class="btn btn-sm"
               [class.btn-primary]="ordenActual === 'fecha'"
               [class.btn-outline-secondary]="ordenActual !== 'fecha'"
@@ -35,11 +50,9 @@
       </button>
     </div>
 
-    <div *ngIf="loading && publicaciones.length === 0" class="text-center p-5">
-      <div class="spinner-border text-light" role="status">
-        <span class="visually-hidden">Cargando publicaciones...</span>
-      </div>
-      <p class="text-white small mt-2">Cargando publicaciones...</p>
+    <!-- Skeleton Loader for Initial Load -->
+    <div *ngIf="loading && publicaciones.length === 0">
+      <app-skeleton-loader [count]="3"></app-skeleton-loader>
     </div>
 
     <ng-container *ngIf="!loading || publicaciones.length > 0">
@@ -63,8 +76,8 @@
               <p class="text-muted mb-2">{{ pub.mensaje | limitadorCaracteres:200 }}</p>
               <img [src]="pub.imagen " class="post-img" *ngIf="pub.imagen">
 
-              <div class="actions d-flex gap-2 mt-2">
-                <button type="button" class="btn btn-sm" [ngClass]="{ 'btn-primary': yaLeDioLike(pub), 'btn-outline-primary': !yaLeDioLike(pub) }" (click)="toggleLike(pub)">
+              <div class="actions d-flex gap-2 mt-2 flex-wrap">
+                <button type="button" class="btn btn-sm" [ngClass]="{ 'btn-primary': yaLeDioLike(pub), 'btn-outline-primary': !yaLeDioLike(pub) }" (click)="toggleLike(pub, $event)">
                   ❤️ {{ pub.likes.length || 0 }}
                 </button>
                 
@@ -84,6 +97,13 @@
                         class="btn btn-outline-danger btn-sm"
                         (click)="eliminarPublicacion(pub._id)">
                   🗑 Eliminar
+                </button>
+
+                <button *ngIf="pub.usuarioId && (pub.usuarioId._id !== usuarioLogueado?._id && pub.usuarioId._id !== usuarioLogueado?.id)"
+                        type="button"
+                        class="btn btn-outline-warning btn-sm"
+                        (click)="reportarPost(pub)">
+                  ⚠️ Reportar
                 </button>
               </div>
               <hr>
@@ -124,12 +144,11 @@
 
         </div>
 
-        <div *ngIf="scrollingLoading" class="text-center my-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Cargando más publicaciones...</span>
-          </div>
-          <p class="text-muted small mt-2">Cargando más publicaciones...</p>
+        <!-- Skeleton Loader for Scroll Loading -->
+        <div *ngIf="scrollingLoading" class="my-4">
+          <app-skeleton-loader [count]="1"></app-skeleton-loader>
         </div>
+
         <p *ngIf="!hasMorePosts && publicaciones.length > 0 && !scrollingLoading" class="text-center text-muted mt-4">
           Fin del feed.
         </p>

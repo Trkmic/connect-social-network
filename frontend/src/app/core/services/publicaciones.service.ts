@@ -32,11 +32,15 @@ export class PublicacionesService {
     obtenerPublicaciones(
         orden: 'fecha' | 'likes' = 'fecha',
         offset = 0,
-        limit = 10
+        limit = 10,
+        siguiendo = 'false',
+        userId = ''
     ): Observable<Publicacion[]> {
-        return this.http.get<Publicacion[]>(
-        `${this.baseUrl}?orden=${orden}&offset=${offset}&limit=${limit}` 
-        );
+        let url = `${this.baseUrl}?orden=${orden}&offset=${offset}&limit=${limit}`;
+        if (siguiendo === 'true' && userId) {
+            url += `&siguiendo=true&userId=${userId}`;
+        }
+        return this.http.get<Publicacion[]>(url);
     }
 
     getPublicacionesUsuario(userId: string, limit: number = 3): Observable<Publicacion[]> {

@@ -14,13 +14,29 @@ import { ValidarTamanioImagenMiddleware } from './middlewares/validar_tamanio_im
 import { ComentariosModule } from './comentarios/comentarios.module';
 import { EstadisticasModule } from './estadisticas/estadisticas.module'; // 👈 AGREGAR
 import { LogsModule } from './logs/logs.module';
+import { NotificacionesModule } from './notificaciones/notificaciones.module';
+import { ChatModule } from './chat/chat.module';
+import { ModeracionModule } from './moderacion/moderacion.module';
 
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),MongooseModule.forRoot(process.env.MONGO_URI!),AuthModule, PublicacionesModule,DatabaseModule,UsuariosModule,ComentariosModule,CloudinaryModule,EstadisticasModule,LogsModule],
+    ConfigModule.forRoot({ isGlobal: true }),
+    MongooseModule.forRoot(process.env.MONGO_URI!),
+    AuthModule,
+    PublicacionesModule,
+    DatabaseModule,
+    UsuariosModule,
+    ComentariosModule,
+    CloudinaryModule,
+    EstadisticasModule,
+    LogsModule,
+    NotificacionesModule,
+    ChatModule,
+    ModeracionModule
+  ],
   controllers: [AppController], 
   providers: [AppService], 
 })

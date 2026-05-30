@@ -8,6 +8,39 @@
     
         <!-- Botones dinámicos -->
         <div class="nav-right d-flex align-items-center gap-2">
+            <!-- Campana de Notificaciones -->
+            <div *ngIf="isLoggedIn" class="notification-container position-relative me-2">
+                <button class="btn-icon" (click)="toggleNotificaciones()">
+                    <span>🔔</span>
+                    <span *ngIf="unreadCount > 0" class="badge-unread">{{ unreadCount }}</span>
+                </button>
+                <div *ngIf="showNotificacionesDropdown" class="notification-dropdown glass-card">
+                    <div class="dropdown-header">
+                        <span>Notificaciones</span>
+                    </div>
+                    <div class="dropdown-body">
+                        <div *ngIf="notificaciones.length === 0" class="dropdown-empty">
+                            No tienes notificaciones
+                        </div>
+                        <div *ngFor="let notif of notificaciones" class="dropdown-item" (click)="clickNotificacion(notif)">
+                            <div class="notif-avatar" *ngIf="notif.emisorId?.imagenPerfil">
+                                <img [src]="notif.emisorId.imagenPerfil" alt="Avatar">
+                            </div>
+                            <div class="notif-avatar" *ngIf="!notif.emisorId?.imagenPerfil">
+                                <span>👤</span>
+                            </div>
+                            <div class="notif-content">
+                                <p class="notif-text">
+                                    <strong>&#64;{{ notif.emisorId?.nombreUsuario || 'usuario' }}</strong>
+                                    {{ getNotifTexto(notif) }}
+                                </p>
+                                <span class="notif-date">{{ notif.createdAt | date:'shortTime' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <button *ngIf="showDashboardEstadisticas" class="btn btn-outline-info" (click)="navegador('dashboard/estadisticas')">
                 Estadísticas Admin
             </button>
@@ -20,7 +53,7 @@
             <button *ngIf="showMiPerfil" class="btn btn-outline-primary" (click)="navegador('mi-perfil')">
             Mi Perfil
             </button>
-            <button *ngIf="showSalir" class="btn btn-danger" (click)="logout()">
+            <button *ngIf="showSalir" class="btn class-danger btn-danger" (click)="logout()">
             Salir
             </button>
         </div>

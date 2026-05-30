@@ -2,8 +2,10 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { UsuariosService } from '../../core/services/usuarios.service';
+import { ModeracionService } from '../../core/services/moderacion.service';
 import { Usuario } from '../../core/interfaces/usuario.interface';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
     selector: 'app-dashboard-usuarios',
@@ -15,10 +17,13 @@ import { Router } from '@angular/router';
 
 export class DashboardUsuariosComponent implements OnInit {
     private usuariosService = inject(UsuariosService);
+    private moderacionService = inject(ModeracionService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
 
     usuarios: Usuario[] = [];
+    reportes: any[] = [];
+    activeTab: 'usuarios' | 'reportes' = 'usuarios';
     isLoading = true;
     error: string | null = null;
     registroExitoso: boolean = false;
@@ -37,6 +42,17 @@ export class DashboardUsuariosComponent implements OnInit {
 
     ngOnInit(): void {
         this.cargarUsuarios();
+        this.cargarReportes();
+    }
+
+    switchTab(tab: 'usuarios' | 'reportes'): void {
+        this.activeTab = tab;
+        this.error = null;
+        if (tab === 'usuarios') {
+            this.cargarUsuarios();
+        } else {
+            this.cargarReportes();
+        }
     }
 
     cargarUsuarios(): void {
@@ -91,6 +107,50 @@ export class DashboardUsuariosComponent implements OnInit {
         error: (err) => {
             this.error = err.error?.message || 'Error al crear el nuevo usuario.';
         }
+        });
+    }
+
+    cargarReportes(): void {
+        this.isLoading = true;
+        this.moderacionService.obtenerReportes().subscribe({
+            next: (data) => {
+                this.reportes = data;
+                this.isLoading = false;
+            },
+            error: (err) => {
+                this.error = 'Error al cargar reportes: ' + (err.error?.message || err.message);
+                this.isLoading = false;
+            }
+        });
+    }
+
+    resolverReporte(id: string, accion: 'eliminar' | 'descartar'): void {
+        const text = accion === 'eliminar' 
+            ? 'Esta acción eliminará permanentemente el contenido reportado y marcará el reporte como resuelto.'
+            : 'Esta acción descartará el reporte sin modificar el contenido.';
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: text,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, continuar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.moderacionService.resolverReporte(id, accion).subscribe({
+                    next: (res) => {
+                        Swal.fire('Éxito', `Reporte ${accion === 'eliminar' ? 'resuelto' : 'descartado'} con éxito.`, 'success');
+                        this.cargarReportes();
+                    },
+                    error: (err) => {
+                        console.error('Error al resolver el reporte:', err);
+                        Swal.fire('Error', 'No se pudo procesar el reporte.', 'error');
+                    }
+                });
+            }
         });
     }
 }

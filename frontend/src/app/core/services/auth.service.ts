@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2'; 
 import { jwtDecode } from 'jwt-decode';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,8 @@ export class AuthService {
 
 
   constructor(private http: HttpClient, 
-    private router: Router
+    private router: Router,
+    private socketService: SocketService
   )
     {
       if (this.getToken()) {
@@ -46,8 +48,8 @@ export class AuthService {
           localStorage.setItem('usuario', JSON.stringify(usuario));
         
           this.startProactiveCheck();
-        
           this.startSessionTimers(); 
+          this.socketService.conectar();
         }
       })
     );
@@ -56,6 +58,7 @@ export class AuthService {
   logout(showModal = true) { 
     this.stopSessionTimers(); 
     this.stopProactiveCheck(); 
+    this.socketService.desconectar();
     
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
@@ -100,6 +103,18 @@ export class AuthService {
 
   getUsuarioPorId(id: string) {
     return this.http.get(`${this.baseUrl}/usuarios/${id}`);
+  }
+
+  getUsuarios(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/usuarios`);
+  }
+
+  seguir(id: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/usuarios/${id}/seguir`, {});
+  }
+
+  dejarDeSeguir(id: string): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/usuarios/${id}/dejar-de-seguir`, {});
   }
 
   actualizarUsuario(id: string, data: any, file: File | null): Observable<any> {
